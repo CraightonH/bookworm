@@ -33,12 +33,9 @@ jobs:
         tags: ${{ secrets.DOCKER_HUB_USERNAME }}/bookworm:${{ github.ref_name }}
         platforms: linux/amd64,linux/arm64
 
-    # - uses: marvinpinto/action-automatic-releases@latest
-    #   with:
-    #     repo_token: "${{ secrets.GITHUB_TOKEN }}"
-    #     prerelease: false
-    #     files: |
-    #       bookworm.sh
-    #       Dockerfile
-    #       README.md
-    #       defaults.env
+    - name: Automatic Releases
+      id: "automatic_releases"
+      uses: marvinpinto/action-automatic-releases@latest
+      with:
+        repo_token: "${{ secrets.GITHUB_TOKEN }}"
+        prerelease: false
