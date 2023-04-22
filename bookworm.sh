@@ -7,7 +7,7 @@ if [ -z "${WATCH_DIR}" ] && [ -z "${OUTPUT_DIR}" ]; then
     echo WATCH_DIR and OUTPUT_DIR not set - using defaults.env
     export $(cat defaults.env | xargs)
 fi
-
+ 
 if [ -z "${ACTIVATION_BYTES}" ]; then
     echo ACTIVATION_BYTES not set - using secrets.env
     export $(cat secrets.env | xargs)
