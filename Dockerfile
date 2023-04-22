@@ -10,4 +10,4 @@ RUN apt update && apt install --no-install-recommends --no-install-suggests -yq 
 
 COPY bookworm.sh defaults.env ${CODEDIR}/
 
-CMD bookworm.sh
+CMD ./bookworm.sh
