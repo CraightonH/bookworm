@@ -37,4 +37,8 @@ jobs:
       with:
         repo_token: "${{ secrets.GITHUB_TOKEN }}"
         prerelease: false
-        id: automatic_releases
+        files: |
+          bookworm.sh
+          Dockerfile
+          README.md
+          defaults.env
