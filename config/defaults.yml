@@ -1,0 +1,23 @@
+input:
+  path: /app/watch
+  extension: .aax
+  cleanup: true
+
+output:
+  path: /app/output
+  extension: .m4b
+  overwrite: true
+
+ffmpeg:
+  run: true
+  path: ffmpeg
+  additional_args:
+    - -hide_banner
+    - -loglevel
+    - error
+    - -nostats
+    - -y
+
+logging:
+  level: info
+  format: '%(asctime)s - %(levelname)s - [%(name)s] %(message)s'
