@@ -49,7 +49,7 @@ The following key/value pairs should be located in one or more `yaml` files moun
 | `input.cleanup`   | switch to control whether input files should be deleted after successful conversion | `true` |
 | `output.path`      | path to directory that converted files will be placed | `/app/output` |
 | `output.extension` | file extension of output files | `.m4b` |
-| `output.overwrite`   | switch to control whether converted files should overwrite an existing file with the same name in the output location | `true` |
+| `output.overwrite`   | switch to control whether converted files should overwrite an existing file with the same name in the output location | `false` |
 | `ffmpeg.run`      | switch to control whether call to ffmpeg is allowed; useful to set `false` for debugging | `true` |
 | `ffmpeg.path` | path to `ffmpeg`; if `ffmpeg` is in `PATH`, keep default value | `ffmpeg` |
 | `ffmpeg.additional_args` | list of extra args added to ffmpeg call; see [ffmpeg Additional Args](#ffmpeg-additional-args) for more details | `['-hide_banner', '-loglevel', 'error', '-nostats', '-y']` |
