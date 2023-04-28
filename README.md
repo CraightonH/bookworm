@@ -49,13 +49,13 @@ The following key/value pairs should be located in one or more `yaml` files moun
 | `input.cleanup`   | switch to control whether input files should be deleted after successful conversion | `true` |
 | `output.path`      | path to directory that converted files will be placed | `/app/output` |
 | `output.extension` | file extension of output files | `.m4b` |
-| `output.overwrite`   | switch to control whether converted files should overwrite an existing file with the same name in the output location | `false` |
+| `output.overwrite`   | switch to control whether converted files should overwrite an existing file with the same name in the output location | `true` |
 | `ffmpeg.run`      | switch to control whether call to ffmpeg is allowed; useful to set `false` for debugging | `true` |
 | `ffmpeg.path` | path to `ffmpeg`; if `ffmpeg` is in `PATH`, keep default value | `ffmpeg` |
 | `ffmpeg.additional_args` | list of extra args added to ffmpeg call; see [ffmpeg Additional Args](#ffmpeg-additional-args) for more details | `['-hide_banner', '-loglevel', 'error', '-nostats', '-y']` |
 | `ffprobe.path` | path to `ffprobe`; if `ffprobe` is in `PATH`, keep default value | `ffprobe` |
 | `ffprobe.additional_args` | list of extra args added to ffprobe call; these grab a specific value, so best not to change the default | `['-show_entries', 'format_tags=title', '-of', 'compact=p=0', '-v', '"0"']` |
-| `logging.level`      | controls logging verbosity; can be one of `info`, `warning`, `error`, `debug` | `info` |
+| `logging.level`      | controls logging verbosity; can be one of `info`, `warning`, `error`, `debug`; see [Debug Logging](#debug-logging) for important information on security concerns | `info` |
 | `logging.format` | controls desired logging format | `'%(asctime)s - %(levelname)s - [%(name)s] %(message)s'` |
 
 ## Python Secrets
@@ -68,7 +68,7 @@ The following key/value pairs should be located in one or more `yaml` files moun
 Instead of `yaml` files, the shell releases use `env` variables. The script will attempt to load the following config from the `env` first, and if not found, will export variables from `defaults.env`.
 | Name            | Description | Default |
 |---              |---          |---      |
-| `WATCH_DIR`      | path to directory that input files will be found | `~/.watch` |
+| `WATCH_DIR`      | path to directory that input files will be found; see [Input Path Notes](#input-path) for more details | `~/.watch` |
 | `OUTPUT_DIR`      | path to directory that converted files will be placed | `~/.output` |
 
 ## Shell Secrets
@@ -86,3 +86,6 @@ The additional args will be added to the command between `ffmpeg` and `-activati
 ```
 ffmpeg -hide_banner -loglevel error -nostats -y -activation_bytes <activation_bytes> -i <input.path> -c copy <output.path>
 ```
+
+### Debug Logging
+If debug logging is enabled, your `activation_bytes` will be written to stdout. Depending on your environment, this may mean your `activation_bytes` will be logged in plain text to a file on disk.
