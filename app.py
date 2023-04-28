@@ -1,5 +1,6 @@
 import os, yaml, logging, subprocess
 from sys import exit as sys_exit
+from pathlib import Path
 
 config = {}
 secret = {}
@@ -55,12 +56,16 @@ def app_setup():
         log.error("(app_setup) Activation bytes not found in secrets nor in environment. Set activation_bytes and try again.")
         sys_exit(1)
 
+def output_exists(output_file) -> bool:
+    return os.path.isfile(output_file)
+
 def cleanup(path):
-    if bool(config["input"]["cleanup"]):
-        os.remove(path)
-        log.info("(cleanup) Cleaned up " + path)
-    else:
+    if not bool(config["input"]["cleanup"]):
         log.warning("(cleanup) Configuration 'input.cleanup: false' blocked cleanup. Set 'input.cleanup: true' to cleanup input files.")
+        return
+
+    os.remove(path)
+    log.info("(cleanup) Cleaned up " + path)
 
 def ffmpeg_call(input_file, command):
     log.info("(ffmpeg_call) Converting " + input_file)
@@ -68,6 +73,26 @@ def ffmpeg_call(input_file, command):
     # TODO: Do a real success check, ie. is output within ~10% of original's file size or use ffmpeg to read streams?
     log.info("(ffmpeg_call) Successfully converted")
     cleanup(input_file)
+
+def get_book_title(path) -> str:
+    command = [config["ffprobe"]["path"], str(path)]
+    command[1:1] = config["ffprobe"]["additional_args"] # Splice additional args in
+    log.debug("(get_book_title) ffprobe command: " + str(command))
+    
+    result = subprocess.check_output(command)
+    log.debug("(get_book_title) ffprobe result: " + result.decode("utf-8").replace("\n", ""))
+
+    return result.decode("utf-8").replace("\n", "")
+
+def get_existing_book_titles() -> list:
+    existing_book_titles = []
+    existing_book_title_paths = list(Path(config["output"]["path"] + "/").rglob("*.[mM]4[bB]"))
+    log.debug("(get_existing_book_titles) existing_book_titles: " + str(existing_book_titles))
+    for file in existing_book_title_paths:
+        existing_book_titles.append(get_book_title(str(file)))
+
+    log.debug("(get_existing_book_titles) existing_book_titles: " + str(existing_book_titles))
+    return existing_book_titles
 
 def convert(file):
     log.info("(convert) Preparing to convert " + file)
@@ -85,17 +110,12 @@ def convert(file):
     log.debug("(convert) Conversion command args: " + str(command))
     log.debug("(convert) Conversion command string: " + command_str)
 
-    if bool(config["ffmpeg"]["run"]):
-        if not os.path.isfile(output_file):
-            ffmpeg_call(input_file, command)
-        else:
-            if bool(config["output"]["overwrite"]):
-                log.debug("(convert) Configuration 'output.overwrite: true'. Set 'output.overwrite: false' if overwriting is not desired.")
-                ffmpeg_call(input_file, command)
-            else:
-                log.warning("(convert) Detected converted file, skipping conversion. Note, set 'output.overwrite: true' to overwrite previously converted files.")
-    else:
+    if not bool(config["ffmpeg"]["run"]):
         log.warning("(convert) Configuration 'ffmpeg.run: false' has blocked conversion. Set 'ffmpeg.run: true' to convert input files.")
+        return
+
+    log.debug("(convert) Configuration 'output.overwrite: true'. Set 'output.overwrite: false' if overwriting is not desired.")
+    ffmpeg_call(input_file, command)
 
 if __name__ == "__main__":
     app_setup()
@@ -106,7 +126,25 @@ if __name__ == "__main__":
     files = [f for f in files if f.endswith(config["input"]["extension"])]
     log.debug("(__main__) Found files: " + str(files))
 
-    log.info("(__main__) Found " + str(len(files)) + " file(s) to convert.")
+    log.info("(__main__) Found " + str(len(files)) + " book(s) to convert.")
+
+    if len(files) == 0:
+        log.debug("(__main__) Exiting with no work to do.")
+        sys_exit()
+
+    existing_books = get_existing_book_titles()
+
+    log.info("(__main__) Found " + str(len(existing_books)) + " existing book(s).")
 
     for file in files:
+        input_file_path = config["input"]["path"] + "/" + file
+        title = get_book_title(input_file_path)
+        if title in existing_books and not bool(config["output"]["overwrite"]):
+            log.debug("(__main__) Book already exists: " + str(file))
+            log.warning("(convert) Book with metadata `" + title + "` already exists; skipping conversion, but cleaning up. Note, set 'output.overwrite: true' to overwrite an existing book.")
+            cleanup(input_file_path)
+            break
+
+        log.debug("(__main__) converting: " + str(file))
         convert(file)
+
