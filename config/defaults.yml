@@ -6,7 +6,7 @@ input:
 output:
   path: /app/output
   extension: .m4b
-  overwrite: true
+  overwrite: false
 
 ffmpeg:
   run: true
@@ -17,6 +17,16 @@ ffmpeg:
     - error
     - -nostats
     - -y
+
+ffprobe:
+  path: ffprobe
+  additional_args:
+    - -show_entries 
+    - format_tags=title 
+    - -of 
+    - compact=p=0 
+    - -v 
+    - "0"
 
 logging:
   level: info

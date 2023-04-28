@@ -51,8 +51,10 @@ The following key/value pairs should be located in one or more `yaml` files moun
 | `output.extension` | file extension of output files | `.m4b` |
 | `output.overwrite`   | switch to control whether converted files should overwrite an existing file with the same name in the output location | `false` |
 | `ffmpeg.run`      | switch to control whether call to ffmpeg is allowed; useful to set `false` for debugging | `true` |
-| `ffmpeg.path` | path to ffmpeg; if ffmpeg is in `PATH`, keep default value | `ffmpeg` |
+| `ffmpeg.path` | path to `ffmpeg`; if `ffmpeg` is in `PATH`, keep default value | `ffmpeg` |
 | `ffmpeg.additional_args` | list of extra args added to ffmpeg call; see [ffmpeg Additional Args](#ffmpeg-additional-args) for more details | `['-hide_banner', '-loglevel', 'error', '-nostats', '-y']` |
+| `ffprobe.path` | path to `ffprobe`; if `ffprobe` is in `PATH`, keep default value | `ffprobe` |
+| `ffprobe.additional_args` | list of extra args added to ffprobe call; these grab a specific value, so best not to change the default | `['-show_entries', 'format_tags=title', '-of', 'compact=p=0', '-v', '"0"']` |
 | `logging.level`      | controls logging verbosity; can be one of `info`, `warning`, `error`, `debug` | `info` |
 | `logging.format` | controls desired logging format | `'%(asctime)s - %(levelname)s - [%(name)s] %(message)s'` |
 
